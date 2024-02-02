@@ -19,6 +19,9 @@ export const meta = () => {
  * @param {LoaderFunctionArgs}
  */
 export async function loader({request, context}) {
+
+  console.log('context.customerAccount', context.customerAccount);
+
   const paginationVariables = getPaginationVariables(request, {
     pageBy: 20,
   });
@@ -36,6 +39,7 @@ export async function loader({request, context}) {
     throw Error('Customer orders not found');
   }
 
+
   return json(
     {customer: data.customer},
     {
@@ -50,6 +54,7 @@ export default function Orders() {
   /** @type {LoaderReturnData} */
   const {customer} = useLoaderData();
   const {orders} = customer;
+
   return (
     <div className="orders">
       {orders.nodes.length ? <OrdersTable orders={orders} /> : <EmptyOrders />}
@@ -104,7 +109,9 @@ function EmptyOrders() {
  * @param {{order: OrderItemFragment}}
  */
 function OrderItem({order}) {
-  const fulfillmentStatus = flattenConnection(order.fulfillments)[0].status;
+  console.log('order.fulfillments.nodes', order.fulfillments.nodes.length);
+  const fulfillmentStatus = order.fulfillments.nodes.length > 0 ? flattenConnection(order.fulfillments)[0].status : 'N/A';
+//  const fulfillmentStatus = flattenConnection(order.fulfillments)[0].status;
   return (
     <>
       <fieldset>
