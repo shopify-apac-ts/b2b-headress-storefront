@@ -19,9 +19,6 @@ export const meta = () => {
  * @param {LoaderFunctionArgs}
  */
 export async function loader({request, context}) {
-
-  console.log('context.customerAccount', context.customerAccount);
-
   const paginationVariables = getPaginationVariables(request, {
     pageBy: 20,
   });
