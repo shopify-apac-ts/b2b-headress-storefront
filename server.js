@@ -51,7 +51,7 @@ export default {
         storeDomain: env.PUBLIC_STORE_DOMAIN,
         storefrontId: env.PUBLIC_STOREFRONT_ID,
         storefrontHeaders: getStorefrontHeaders(request),
-        storefrontApiVersion: "unstable", // test
+        storefrontApiVersion: "unstable", // test: unstable API
       });
 
       /**
@@ -63,7 +63,7 @@ export default {
         session,
         customerAccountId: env.PUBLIC_CUSTOMER_ACCOUNT_API_CLIENT_ID,
         customerAccountUrl: env.PUBLIC_CUSTOMER_ACCOUNT_API_URL,
-        customerApiVersion: "unstable", // test
+        customerApiVersion: "unstable", // test: unstable API
       });
 
       /*
