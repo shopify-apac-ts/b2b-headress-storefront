@@ -37,18 +37,8 @@ export async function loader({request, context}) {
     throw Error('Customer orders not found');
   }
 
-  const {data2, error2} = await context.customerAccount.mutate(
-    CREATE_SF_CUSTOMER_TOKEN_MUTATION,
-  );
-/*
-  if (error2?.length || !data2?.customerAccessToken) {
-    console.table(error2);
-    throw Error('Customer SF token failed to create');
-  }
-*/
-  return json(
+  return json (
     {customer: data.customer},
-//    {sf_customer_token: data2.customerAccessToken},
     {
       headers: {
         'Set-Cookie': await context.session.commit(),
@@ -60,9 +50,7 @@ export async function loader({request, context}) {
 export default function Orders() {
   /** @type {LoaderReturnData} */
   const {customer} = useLoaderData();
-//  const {customer, sf_customer_token} = useLoaderData();
   const {orders} = customer;
-//  console.log('sf_customer_token', sf_customer_token);
 
   return (
     <div className="orders">

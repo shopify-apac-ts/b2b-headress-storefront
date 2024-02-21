@@ -3,6 +3,10 @@ import {Await, useLoaderData, Link} from '@remix-run/react';
 import {Suspense} from 'react';
 import {Image, Money} from '@shopify/hydrogen';
 
+// TEST: globals
+let customerAccessToken = null;
+let companyLocationId = null;
+
 /**
  * @type {MetaFunction}
  */
@@ -14,9 +18,40 @@ export const meta = () => {
  * @param {LoaderFunctionArgs}
  */
 export async function loader({context}) {
+
+  const data = await context.customerAccount.mutate(
+    ` mutation storefrontCustomerAccessTokenCreate {
+      storefrontCustomerAccessTokenCreate {
+        customerAccessToken
+        userErrors {
+          field
+          message
+        }
+      }
+    }`,
+  );
+  customerAccessToken = data.data.storefrontCustomerAccessTokenCreate.customerAccessToken;
+  console.log("token", customerAccessToken);
+  console.log("data", data.data);
+  console.log("cost", data.extensions.cost);
+
+//  const companyLocationId = "1385594902";
+  companyLocationId = "gid://shopify/CompanyLocation/1385594902";
+  const data2 = await context.customerAccount.query(
+    `query {
+        companyLocation(id:"${companyLocationId}") {
+          id
+          externalId
+          name
+        }
+    }`
+  );
+  console.log('companyLocation', data2.data.companyLocation);
+
   const {storefront} = context;
   const {collections} = await storefront.query(FEATURED_COLLECTION_QUERY);
   const featuredCollection = collections.nodes[0];
+//  const recommendedProducts = storefront.query(RECOMMENDED_PRODUCTS_QUERY_B2B);
   const recommendedProducts = storefront.query(RECOMMENDED_PRODUCTS_QUERY);
 
   return defer({featuredCollection, recommendedProducts});
@@ -148,6 +183,38 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
     }
   }
 `;
+
+const RECOMMENDED_PRODUCTS_QUERY_B2B = `#graphql
+  fragment RecommendedProduct on Product {
+    id
+    title
+    handle
+    priceRange {
+      minVariantPrice {
+        amount
+        currencyCode
+      }
+    }
+    images(first: 1) {
+      nodes {
+        id
+        url
+        altText
+        width
+        height
+      }
+    }
+  }
+  query RecommendedProductsB2B ($country: CountryCode, $language: LanguageCode, $buyer: Buyer)
+    @inContext(country: $country, language: $language, buyer: $buyer) {
+    products(first: 4, sortKey: UPDATED_AT, reverse: true) {
+      nodes {
+        ...RecommendedProduct
+      }
+    }
+  }
+`;
+
 
 /** @typedef {import('@shopify/remix-oxygen').LoaderFunctionArgs} LoaderFunctionArgs */
 /** @template T @typedef {import('@remix-run/react').MetaFunction<T>} MetaFunction */
